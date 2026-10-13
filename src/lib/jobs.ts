@@ -7,7 +7,7 @@ export const totalPositions = jobs.reduce((sum, job) => sum + (job.positions ?? 
 export const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 export function sectorOf(job: Job): string {
   const text = normalize(`${job.company} ${job.title}`);
-  if (/cirfa|cerfa/.test(text)) return 'Défense & sécurité';
+  if (/cirfa|cerfa|policier|securite/.test(text)) return 'Défense & sécurité';
   if (/aeronaut|mecanicien piste|composite/.test(text)) return 'Industrie & aéronautique';
   if (/hotel|ibis|cuisine|cusinier|cuisinier|serveur|sommelier|restauration|patisserie|chef de rang/.test(text)) return 'Hôtellerie & restauration';
   if (/association|domicile|vie|educat|puericulture|enfants|animation|animateur|soignant|ergother|infirm|social|creche/.test(text)) return 'Santé & services';
