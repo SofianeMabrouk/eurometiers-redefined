@@ -6,7 +6,7 @@ import { SiteLayout, JobCard, pageMeta, useSavedJobs } from '@/components/site';
 import { filterJobs, sectors } from '@/lib/jobs';
 import pdf from '@/assets/offres-2026.asset.json';
 
-export const Route = createFileRoute('/offres')({ validateSearch: (search: Record<string, unknown>): { q?: string; entreprise?: string } => ({ q: typeof search.q === 'string' ? search.q : undefined, entreprise: typeof search.entreprise === 'string' ? search.entreprise : undefined }), head: () => pageMeta('Offres d’emploi 2026 · Eurométiers Marseille', 'Recherchez un métier, filtrez par contrat ou secteur et préparez vos rencontres avec les entreprises du salon Eurométiers.'), component: Offers });
+export const Route = createFileRoute('/offres')({ validateSearch: (search: Record<string, unknown>): { q?: string | undefined; entreprise?: string | undefined } => ({ q: typeof search['q'] === 'string' ? search['q'] : undefined, entreprise: typeof search['entreprise'] === 'string' ? search['entreprise'] : undefined }), head: () => pageMeta('Offres d’emploi 2026 · Eurométiers Marseille', 'Recherchez un métier, filtrez par contrat ou secteur et préparez vos rencontres avec les entreprises du salon Eurométiers.'), component: Offers });
 function Offers() {
   const search = Route.useSearch();
   const navigate = useNavigate();
