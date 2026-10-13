@@ -1,0 +1,25 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState, type FormEvent } from 'react';
+import { Search, ArrowRight, Download, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { SiteLayout, JobCard, pageMeta, useSavedJobs } from '@/components/site';
+import { filterJobs, sectors } from '@/lib/jobs';
+import pdf from '@/assets/offres-2026.asset.json';
+
+export const Route = createFileRoute('/offres')({ validateSearch: (search: Record<string, unknown>): { q?: string | undefined; entreprise?: string | undefined } => ({ q: typeof search['q'] === 'string' ? search['q'] : undefined, entreprise: typeof search['entreprise'] === 'string' ? search['entreprise'] : undefined }), head: () => pageMeta('Offres d’emploi 2026 · Eurométiers Marseille', 'Recherchez un métier, filtrez par contrat ou secteur et préparez vos rencontres avec les entreprises du salon Eurométiers.'), component: Offers });
+function Offers() {
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const [draft, setDraft] = useState(search.q ?? '');
+  const [contract, setContract] = useState('');
+  const [sector, setSector] = useState('');
+  const [favorites, setFavorites] = useState(false);
+  const [page, setPage] = useState(1);
+  const { saved } = useSavedJobs();
+  const results = filterJobs(search.q, contract, sector, search.entreprise).filter(job => !favorites || saved.includes(job.id));
+  const pages = Math.max(1, Math.ceil(results.length / 12));
+  const current = Math.min(page, pages);
+  const submit = (event: FormEvent) => { event.preventDefault(); setPage(1); navigate({ to: '/offres', search: { q: draft, entreprise: search.entreprise } }); };
+  const reset = () => { setDraft(''); setContract(''); setSector(''); setFavorites(false); setPage(1); navigate({ to: '/offres', search: {} }); };
+  return <SiteLayout><section className="page-intro"><div className="container"><span className="eyebrow">UN MÉTIER, UNE RENCONTRE, UN AVENIR</span><h1>Trouvez votre prochaine opportunité.</h1><p>Les offres du salon Eurométiers 2026, réunies au même endroit.</p><form className="hero-search" onSubmit={submit}><Search /><input aria-label="Rechercher un métier ou une entreprise" placeholder="Un métier ou une entreprise…" value={draft} onChange={event => setDraft(event.target.value)} /><Button type="submit">Rechercher <ArrowRight /></Button></form></div></section><section className="container offers-body"><div className="filter-bar"><label>Contrat<select aria-label="Type de contrat" value={contract} onChange={event => { setContract(event.target.value); setPage(1); }}><option value="">Tous les contrats</option>{['CDI', 'CDD', 'Intérim', 'Alternance', 'Stage', 'Non précisé'].map(value => <option key={value}>{value}</option>)}</select></label><label>Secteur<select aria-label="Secteur d’activité" value={sector} onChange={event => { setSector(event.target.value); setPage(1); }}><option value="">Tous les secteurs</option>{sectors.map(value => <option key={value}>{value}</option>)}</select></label><Button variant="ghost" onClick={reset}>Réinitialiser</Button><Button variant="outline" className={`favorite-filter ${favorites ? 'selected' : ''}`} aria-pressed={favorites} onClick={() => { setFavorites(!favorites); setPage(1); }}><Bookmark /> Ma sélection ({saved.length})</Button></div>{search.entreprise && <p className="source-note">Entreprise : {search.entreprise}</p>}<div className="results-heading"><strong>{results.length} résultat{results.length > 1 ? 's' : ''}</strong><a href={pdf.url} target="_blank" rel="noreferrer" className="text-link"><Download size={15} /> Les offres en PDF</a></div>{results.length ? <><div className="jobs-grid">{results.slice((current - 1) * 12, current * 12).map(job => <JobCard key={job.id} job={job} />)}</div><div className="pagination-row"><Button variant="outline" size="icon" aria-label="Page précédente" disabled={current === 1} onClick={() => { setPage(current - 1); window.scrollTo({ top: 320, behavior: 'smooth' }); }}><ChevronLeft /></Button><span>Page {current} sur {pages}</span><Button variant="outline" size="icon" aria-label="Page suivante" disabled={current === pages} onClick={() => { setPage(current + 1); window.scrollTo({ top: 320, behavior: 'smooth' }); }}><ChevronRight /></Button></div></> : <div className="empty-state"><Search size={32} /><h2>{favorites ? 'Votre sélection est vide' : 'Pas encore la bonne rencontre ?'}</h2><p>{favorites ? 'Aucune offre sélectionnée ne correspond à ces filtres.' : 'Essayez un autre métier ou élargissez vos filtres.'}</p><Button variant="outline" onClick={reset}>Voir toutes les offres</Button></div>}<p className="source-note">Source : offres Eurométiers du 13 octobre 2026. Les secteurs sont classés à titre indicatif. Votre sélection reste disponible pendant cette visite.</p></section></SiteLayout>;
+}

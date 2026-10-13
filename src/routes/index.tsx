@@ -1,24 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { useState, type FormEvent } from 'react';
+import { ArrowRight, ArrowUpRight, Search, MapPin, BriefcaseBusiness, Building2, Handshake, GraduationCap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { SiteLayout, JobCard, EventDetails, pageMeta } from '@/components/site';
+import { jobs, totalPositions, filterJobs } from '@/lib/jobs';
+import hero from '@/assets/eurometiers-rencontres.jpg';
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
+export const Route = createFileRoute('/')({ head: () => pageMeta('Eurométiers · Les rencontres qui font votre avenir', 'Découvrez les offres d’emploi et les entreprises du salon Eurométiers 2026, le 13 octobre au World Trade Center Marseille Provence.'), component: Index });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+  const [query, setQuery] = useState('');
+  const [contract, setContract] = useState('');
+  const navigate = useNavigate();
+  const submit = (event: FormEvent) => { event.preventDefault(); navigate({ to: '/offres', search: { q: query } }); };
+  const featuredIds = ['1', '11', '22', '178', '18', '100'];
+  const featured = contract ? filterJobs('', contract).slice(0, 6) : featuredIds.map(id => jobs.find(job => job.id === id)).filter((job): job is typeof jobs[number] => Boolean(job));
+  return <SiteLayout><section className="home-hero"><img className="hero-image" src={hero} width={1920} height={1024} alt="Une candidate échange avec des recruteurs dans un espace lumineux à Marseille — illustration du salon" /><div className="hero-image-wash" /><div className="container hero-content"><span className="eyebrow hero-eyebrow"><span className="live-dot" /> LE RENDEZ-VOUS DE L’EMPLOI À MARSEILLE</span><h1><span>Eurométiers.</span><span>Des rencontres qui</span><span className="highlight-text">font votre avenir.</span></h1><p className="hero-description">Un emploi, une formation, un nouveau départ.<br />Rencontrez les entreprises qui recrutent et trouvez<br className="hidden sm:block" /> l’opportunité qui vous ressemble.</p><form className="hero-search" onSubmit={submit}><Search /><input aria-label="Rechercher un métier ou une entreprise" placeholder="Un métier, une compétence, une entreprise…" value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">Trouver mon emploi <ArrowRight /></Button></form><div className="popular-searches"><span>À explorer :</span>{['Aéronautique', 'Aide à domicile', 'Électricien'].map(term => <Button key={term} variant="outline" asChild><Link to="/offres" search={{ q: term }}>{term}<ArrowUpRight size={10} /></Link></Button>)}</div></div><div className="hero-location"><MapPin size={15} /><span>Marseille · Euroméditerranée</span></div></section>
+    <section className="stats-band" aria-label="Le salon en chiffres"><div className="container stats-inner">{[{ icon: BriefcaseBusiness, value: `${totalPositions}+`, label: 'postes dans les offres 2026' }, { icon: Building2, value: '50+', label: 'enseignes au salon' }, { icon: Handshake, value: '19e', label: 'édition, toujours à vos côtés' }, { icon: GraduationCap, value: 'Tous', label: 'les profils, tous les parcours' }].map(stat => <div className="stat" key={stat.value}><span className="stat-icon"><stat.icon size={21} /></span><div><strong>{stat.value}</strong><small>{stat.label}</small></div></div>)}</div></section>
+    <section className="section container"><div className="section-heading"><div><span className="eyebrow">VOTRE PROCHAINE OPPORTUNITÉ</span><h2>Les entreprises recrutent. Et vous ?</h2><p>Des offres concrètes, des rencontres directes. Le premier pas commence ici.</p></div><Link to="/offres" className="text-link">Voir toutes les offres <ArrowRight size={15} /></Link></div><div className="sector-tabs" aria-label="Filtrer les offres par contrat">{[{ value: '', label: 'Toutes les offres' }, { value: 'CDI', label: 'CDI' }, { value: 'CDD', label: 'CDD' }, { value: 'Intérim', label: 'Intérim' }, { value: 'Alternance', label: 'Alternance' }, { value: 'Stage', label: 'Stage' }].map(tab => <Button key={tab.value} variant={contract === tab.value ? 'default' : 'outline'} aria-pressed={contract === tab.value} onClick={() => setContract(tab.value)}>{tab.label}</Button>)}</div><div className="jobs-grid">{featured.map(job => <JobCard job={job} key={job.id} />)}</div><p className="source-note">Offres issues du document Eurométiers du 13 octobre 2026 · Informations à confirmer auprès des recruteurs.</p></section>
+    <section className="partners-section"><div className="container partners-inner"><p className="partners-intro">Ils recrutent à Marseille.<br /><strong>Ils vous attendent au salon.</strong></p><div className="partner-wordmarks"><span className="partner-wordmark">BNP PARIBAS<small>La banque d’un monde qui change</small></span><span className="partner-wordmark large">adéquat<small>AÉRONAUTIQUE</small></span><span className="partner-wordmark">Ville de<br />Marseille</span><span className="partner-wordmark">InterContinental<small>MARSEILLE · HOTEL DIEU</small></span><span className="partner-wordmark large">Job Link<span className="brand-dot">.</span></span></div></div></section>
+    <section className="event-section"><div className="container event-promo"><div><span className="eyebrow">BIEN PLUS QU’UN SALON</span><h2>Votre prochain chapitre<br />s’écrit en face à face.</h2><p>Une journée pour rencontrer, échanger et avancer. Des recruteurs, des acteurs de la formation et des ateliers pour ouvrir de nouvelles perspectives.</p><EventDetails /></div><aside><h3>Venez comme vous êtes.<br />Repartez avec des perspectives.</h3><div className="visit-step"><span>01</span><p>Repérez les offres qui vous intéressent.</p></div><div className="visit-step"><span>02</span><p>Préparez votre CV et vos questions.</p></div><div className="visit-step"><span>03</span><p>Rencontrez vos futurs employeurs.</p></div><Button asChild><Link to="/le-salon">Je prépare ma visite <ArrowUpRight /></Link></Button></aside></div></section>
+  </SiteLayout>;
 }
