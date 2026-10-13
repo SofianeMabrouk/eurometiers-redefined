@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the public experience in TanStack file routes with a shared SiteLayout and CSS design tokens, so navigation and branding stay consistent.
+- Source the job catalogue from the supplied document in src/data/jobs.json; retain missing values rather than inventing recruitment details.
+- Share selected job IDs through a session-only React provider; do not imply account storage or online application submission.
