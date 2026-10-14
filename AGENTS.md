@@ -12,3 +12,5 @@
 - Keep the public experience in TanStack file routes with a shared SiteLayout and CSS design tokens, so navigation and branding stay consistent.
 - Source the job catalogue from the supplied document in src/data/jobs.json; retain missing values rather than inventing recruitment details.
 - Share selected job IDs through a session-only React provider; do not imply account storage or online application submission.
+
+- Render company logos through the shared CompanyLogo component and a document-independent asset mapping; use official downloaded logos stored on Lovable Assets and initials when no verified logo is available, so employer identity stays consistent without inventing artwork.
