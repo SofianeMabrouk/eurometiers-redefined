@@ -9,6 +9,8 @@ import { CompanyLogo } from '@/components/company-logo';
 
 export const Route = createFileRoute('/')({ head: () => pageMeta('Eurométiers · Les rencontres qui font votre avenir', 'Découvrez les offres d’emploi et les entreprises du salon Eurométiers 2026, le 13 octobre au World Trade Center Marseille Provence.'), component: Index });
 
+const partners = ['BNP PARIBAS', 'ADEQUAT AERONAUTIQUE', 'VILLE DE MARSEILLE', 'INTERCONTINENTAL Marseille', 'JOB LINK'];
+
 function Index() {
   const [query, setQuery] = useState('');
   const [contract, setContract] = useState('');
